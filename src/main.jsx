@@ -2,11 +2,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-import { CustomThemeProvider } from './context/ThemeContext'; // ✅ Import
+import { CustomThemeProvider } from './context/ThemeContext';
+import { Analytics } from "@vercel/analytics/react"
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <CustomThemeProvider>   {/* ✅ Wrap App in Theme Provider */}
+    <CustomThemeProvider> 
       <App />
     </CustomThemeProvider>
   </StrictMode>,

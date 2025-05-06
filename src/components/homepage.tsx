@@ -99,7 +99,7 @@ const Homepage = () => {
         paddingLeft: '12%',
         paddingRight: '12%'
       }}>
-        <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
+        <Paper elevation={0} sx={{ p: 4, width: '100%' }}>
           <Typography variant="h4" gutterBottom>
             Loan Calculator Dashboard
           </Typography>

@@ -11,7 +11,7 @@ function App() {
     <div className='navbar' >
     <Navbar/>
     </div>
-    <div className='main-content' >
+    <div className='homepage' >
     <Homepage/>
     </div>
      

@@ -14,6 +14,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
+import { useColorMode } from '../context/ThemeContext'; // ✅ import the hook
 
 interface Props {
   /**
@@ -27,6 +28,7 @@ const drawerWidth = 240;
 const navItems = ['Home', 'EXCHANGE RATES (LIVE)', 'ABOUT','ERROR PAGE'];
 
 export default function Navbar(props: Props) {
+    const { toggleColorMode } = useColorMode(); 
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -78,7 +80,7 @@ export default function Navbar(props: Props) {
                 {item}
               </Button>
             ))}
-            <Switch {...label} />
+            <Switch {...label} onChange={toggleColorMode} />
           </Box>
         </Toolbar>
       </AppBar>

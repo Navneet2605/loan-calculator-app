@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Box, Button, Paper, TextField, Typography, Stack, FormControl,
-  InputLabel, Select, MenuItem, SelectChangeEvent
-} from '@mui/material';
-import LoanTable from './loantable';
+  Box,
+  Button,
+  Paper,
+  TextField,
+  Typography,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+} from "@mui/material";
+import LoanTable from "./loantable";
 
 interface LoanRow {
   month: number;
@@ -16,28 +25,31 @@ const Homepage = () => {
   const [loanAmount, setLoanAmount] = useState(1000);
   const [interestRate, setInterestRate] = useState(7.5);
   const [termYears, setTermYears] = useState(2);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState("USD");
   const [emi, setEmi] = useState<number | null>(null);
   const [schedule, setSchedule] = useState<LoanRow[]>([]);
   const [showTable, setShowTable] = useState(false);
-  const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
+  const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>(
+    {}
+  );
 
- 
   useEffect(() => {
     const fetchRates = async () => {
-      if (!emi || currency === 'USD') return; 
+      if (!emi || currency === "USD") return;
       try {
-        const res = await fetch(`https://v6.exchangerate-api.com/v6/3e5addd00f93efa1bdad35c5/latest/USD`);
+        const res = await fetch(
+          `https://v6.exchangerate-api.com/v6/3e5addd00f93efa1bdad35c5/latest/USD`
+        );
         const data = await res.json();
-  
+
         if (data && data.conversion_rates) {
           setExchangeRates(data.conversion_rates);
         }
       } catch (error) {
-        console.error('Error fetching exchange rates:', error);
+        console.error("Error fetching exchange rates:", error);
       }
     };
-  
+
     fetchRates();
   }, [currency, emi]);
 
@@ -50,10 +62,11 @@ const Homepage = () => {
     const rate = interestRate / (12 * 100);
     const time = termYears * 12;
 
-    const emiVal = (principal * rate * Math.pow(1 + rate, time)) / (Math.pow(1 + rate, time) - 1);
+    const emiVal =
+      (principal * rate * Math.pow(1 + rate, time)) /
+      (Math.pow(1 + rate, time) - 1);
     setEmi(emiVal);
 
-    // Generate schedule
     let balance = principal;
     const scheduleData: LoanRow[] = [];
 
@@ -78,7 +91,7 @@ const Homepage = () => {
     setLoanAmount(1000);
     setInterestRate(7.5);
     setTermYears(2);
-    setCurrency('USD');
+    setCurrency("USD");
     setEmi(null);
     setSchedule([]);
     setShowTable(false);
@@ -91,15 +104,17 @@ const Homepage = () => {
 
   return (
     <>
-      <Box sx={{
-        minHeight: '30vh',
-        display: 'flex',
-        justifyContent: 'left',
-        alignItems: 'center',
-        paddingLeft: '12%',
-        paddingRight: '12%'
-      }}>
-        <Paper elevation={0} sx={{ p: 4, width: '100%' }}>
+      <Box
+        sx={{
+          minHeight: "30vh",
+          display: "flex",
+          justifyContent: "left",
+          alignItems: "center",
+          paddingLeft: "12%",
+          paddingRight: "12%",
+        }}
+      >
+        <Paper elevation={0} sx={{ p: 4, width: "100%" }}>
           <Typography variant="h4" gutterBottom>
             Loan Calculator Dashboard
           </Typography>
@@ -111,9 +126,11 @@ const Homepage = () => {
               onChange={(e) => setLoanAmount(Number(e.target.value))}
             />
             <TextField
+              type="number"
               label="Interest Rate (%)"
               value={interestRate}
-              onChange={(e) => setInterestRate(Number(e.target.value))}
+              onChange={(e) => setInterestRate(parseFloat(e.target.value))}
+              inputProps={{ step: "0.01" }} 
             />
             <TextField
               label="Term (Years)"
@@ -143,8 +160,8 @@ const Homepage = () => {
                 spacing={2}
                 sx={{
                   paddingTop: 3,
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
                 <FormControl sx={{ maxWidth: 120 }}>
@@ -154,17 +171,21 @@ const Homepage = () => {
                     onChange={handleChange}
                     label="Currency"
                   >
-                    <MenuItem value='USD'>USD</MenuItem>
-                    <MenuItem value='INR'>INR</MenuItem>
-                    <MenuItem value='EUR'>EUR</MenuItem>
-                    <MenuItem value='GBP'>GBP</MenuItem>
-                    <MenuItem value='JPY'>JPY</MenuItem>
-                    <MenuItem value='AUD'>AUD</MenuItem>
-                    <MenuItem value='CAD'>CAD</MenuItem>
+                    <MenuItem value="USD">USD</MenuItem>
+                    <MenuItem value="INR">INR</MenuItem>
+                    <MenuItem value="EUR">EUR</MenuItem>
+                    <MenuItem value="GBP">GBP</MenuItem>
+                    <MenuItem value="JPY">JPY</MenuItem>
+                    <MenuItem value="AUD">AUD</MenuItem>
+                    <MenuItem value="CAD">CAD</MenuItem>
                   </Select>
                 </FormControl>
 
-                <Button variant="outlined" color='secondary' onClick={resetForm}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={resetForm}
+                >
                   Reset Table
                 </Button>
               </Stack>
@@ -174,14 +195,14 @@ const Homepage = () => {
       </Box>
 
       {showTable && (
-  <Box sx={{ px: '12%', pt: 4 }}>
-    <LoanTable
-      data={schedule}
-      emi={emi! * (exchangeRates[currency] || 1)}
-      currency={currency}
-    />
-  </Box>
-)}
+        <Box sx={{ px: "12%", pt: 4 }}>
+          <LoanTable
+            data={schedule}
+            emi={emi! * (exchangeRates[currency] || 1)}
+            currency={currency}
+          />
+        </Box>
+      )}
     </>
   );
 };

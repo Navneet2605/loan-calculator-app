@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Button, Paper, TextField, Typography, Stack, FormControl,
   InputLabel, Select, MenuItem, SelectChangeEvent
@@ -20,6 +20,26 @@ const Homepage = () => {
   const [emi, setEmi] = useState<number | null>(null);
   const [schedule, setSchedule] = useState<LoanRow[]>([]);
   const [showTable, setShowTable] = useState(false);
+  const [exchangeRates, setExchangeRates] = useState<{ [key: string]: number }>({});
+
+ 
+  useEffect(() => {
+    const fetchRates = async () => {
+      if (!emi || currency === 'USD') return; 
+      try {
+        const res = await fetch(`https://v6.exchangerate-api.com/v6/3e5addd00f93efa1bdad35c5/latest/USD`);
+        const data = await res.json();
+  
+        if (data && data.conversion_rates) {
+          setExchangeRates(data.conversion_rates);
+        }
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+      }
+    };
+  
+    fetchRates();
+  }, [currency, emi]);
 
   const handleChange = (event: SelectChangeEvent) => {
     setCurrency(event.target.value as string);
@@ -53,6 +73,21 @@ const Homepage = () => {
     setSchedule(scheduleData);
     setShowTable(true);
   };
+
+  const resetForm = () => {
+    setLoanAmount(1000);
+    setInterestRate(7.5);
+    setTermYears(2);
+    setCurrency('USD');
+    setEmi(null);
+    setSchedule([]);
+    setShowTable(false);
+  };
+
+  const convertedEMI =
+    emi !== null && exchangeRates[currency]
+      ? (emi * exchangeRates[currency]).toFixed(2)
+      : null;
 
   return (
     <>
@@ -91,76 +126,65 @@ const Homepage = () => {
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ pt: 2 }}>
-            <Button variant="contained" onClick={calculateEMI}  sx={{
-                
-            }}>Calculate</Button>
-          
+            <Button variant="contained" onClick={calculateEMI}>
+              Calculate
+            </Button>
           </Stack>
+
           {showTable && (
-  <>
-    <Stack sx={{ paddingTop: 3 }}>
-      {emi !== null && (
-        <Typography variant="h6" sx={{ mt: 3 }}>
-          Monthly EMI: {emi.toFixed(2)} {currency}
-        </Typography>
-      )}
-    </Stack>
+            <>
+              <Stack sx={{ paddingTop: 3 }}>
+                {convertedEMI && (
+                  <Typography variant="h6" sx={{ mt: 3 }}>
+                    Monthly EMI: {convertedEMI} {currency}
+                  </Typography>
+                )}
+              </Stack>
 
-    <Stack
-      direction="row"
-      spacing={2}
-      sx={{
-        paddingTop: 3,
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}
-    >
-      <FormControl sx={{ maxWidth: 120 }}>
-        <InputLabel>Currency</InputLabel>
-        <Select
-          value={currency}
-          onChange={handleChange}
-          label="Currency"
-        >
-          <MenuItem value='USD'>USD</MenuItem>
-          <MenuItem value='INR'>INR</MenuItem>
-          <MenuItem value='EUR'>EUR</MenuItem>
-          <MenuItem value='GBP'>GBP</MenuItem>
-          <MenuItem value='JPY'>JPY</MenuItem>
-          <MenuItem value='AUD'>AUD</MenuItem>
-          <MenuItem value='CAD'>CAD</MenuItem>
-        
-        </Select>
-      </FormControl>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  paddingTop: 3,
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <FormControl sx={{ maxWidth: 120 }}>
+                  <InputLabel>Currency</InputLabel>
+                  <Select
+                    value={currency}
+                    onChange={handleChange}
+                    label="Currency"
+                  >
+                    <MenuItem value='USD'>USD</MenuItem>
+                    <MenuItem value='INR'>INR</MenuItem>
+                    <MenuItem value='EUR'>EUR</MenuItem>
+                    <MenuItem value='GBP'>GBP</MenuItem>
+                    <MenuItem value='JPY'>JPY</MenuItem>
+                    <MenuItem value='AUD'>AUD</MenuItem>
+                    <MenuItem value='CAD'>CAD</MenuItem>
+                  </Select>
+                </FormControl>
 
-      <Button
-  variant="outlined"
-  color="secondary"
-  type="button"
-  onClick={() => {
-    setLoanAmount(1000);
-    setInterestRate(7.5);
-    setTermYears(2);
-    setCurrency('USD');
-    setEmi(null);
-    setSchedule([]);
-    setShowTable(false);
-  }}
->
-  Reset Table
-</Button>
-    </Stack>
-  </>
-)}
-
+                <Button variant="outlined" color='secondary' onClick={resetForm}>
+                  Reset Table
+                </Button>
+              </Stack>
+            </>
+          )}
         </Paper>
       </Box>
 
       {showTable && (
-        <Box sx={{ px: '12%', pt: 4 }}>
-          <LoanTable data={schedule} />
-        </Box>
-      )}
+  <Box sx={{ px: '12%', pt: 4 }}>
+    <LoanTable
+      data={schedule}
+      emi={emi! * (exchangeRates[currency] || 1)}
+      currency={currency}
+    />
+  </Box>
+)}
     </>
   );
 };

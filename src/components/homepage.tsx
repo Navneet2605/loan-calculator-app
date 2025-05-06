@@ -107,19 +107,16 @@ const Homepage = () => {
           <Stack direction="row" spacing={2}>
             <TextField
               label="Loan Amount"
-              type="number"
               value={loanAmount}
               onChange={(e) => setLoanAmount(Number(e.target.value))}
             />
             <TextField
               label="Interest Rate (%)"
-              type="number"
               value={interestRate}
               onChange={(e) => setInterestRate(Number(e.target.value))}
             />
             <TextField
               label="Term (Years)"
-              type="number"
               value={termYears}
               onChange={(e) => setTermYears(Number(e.target.value))}
             />

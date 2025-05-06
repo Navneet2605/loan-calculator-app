@@ -14,13 +14,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
-import { useColorMode } from '../context/ThemeContext'; // ✅ import the hook
+import { useColorMode } from '../context/ThemeContext';
 
 interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
+  
   window?: () => Window;
 }
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
